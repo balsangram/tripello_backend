@@ -113,3 +113,42 @@ export const topReview = asyncHandler(async (req, res, next) => {
         next(new ApiError(error.message, 500));
     }
 });
+
+export const searchResult = asyncHandler(async (req, res, next) => {
+    try {
+        const { state_name, city_name, stayType } = req.query;
+
+        // Build dynamic query object
+        const query = {};
+
+        if (state_name) {
+            query.state_name = { $regex: `^${state_name}$`, $options: "i" }; // case-insensitive
+        }
+
+        if (city_name) {
+            query.city_name = { $regex: `^${city_name}$`, $options: "i" }; // case-insensitive
+        }
+
+        if (stayType) {
+            query.stayType = { $regex: `^${stayType}$`, $options: "i" }; // case-insensitive
+        }
+
+        // Fetch stays from DB
+        const stays = await Stay.find(query)
+            .sort({ _id: -1 }) // latest to oldest
+            .populate("state_id city_id")
+            .lean();
+
+        if (!stays || stays.length === 0) {
+            return next(new ApiError("No stays found with the given criteria", 404));
+        }
+
+        res.status(200).json({
+            status: "success",
+            results: stays.length,
+            data: stays,
+        });
+    } catch (error) {
+        next(new ApiError(error.message, 500));
+    }
+});
