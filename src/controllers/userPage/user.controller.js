@@ -21,7 +21,6 @@ export const homeFeatured = asyncHandler(async (req, res, next) => {
     });
 });
 
-
 export const homeStayTypes = asyncHandler(async (req, res, next) => {
     try {
         // Get all unique stay types
@@ -42,6 +41,31 @@ export const homeStayTypes = asyncHandler(async (req, res, next) => {
             status: "success",
             results: staysByType.length,
             data: staysByType,
+        });
+    } catch (error) {
+        next(new ApiError(error.message, 500));
+    }
+});
+
+export const cityBaes = asyncHandler(async (req, res, next) => {
+    try {
+        // Default to Bengaluru if no city is provided
+        const city = req.query.city || "Bengaluru";
+
+        // Find stays where city_name matches the query (case-insensitive)
+        const stays = await Stay.find({ city_name: { $regex: `^${city}$`, $options: "i" } })
+            .sort({ _id: -1 }) // latest first
+            .limit(15)
+            .populate("state_id city_id"); // populate state and city references
+
+        if (!stays || stays.length === 0) {
+            return next(new ApiError(`No stays found in city: ${city}`, 404));
+        }
+
+        res.status(200).json({
+            status: "success",
+            results: stays.length,
+            data: stays,
         });
     } catch (error) {
         next(new ApiError(error.message, 500));

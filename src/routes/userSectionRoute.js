@@ -1,6 +1,6 @@
 // routes/userRoutes.js
 import { Router } from "express";
-import { homeFeatured, homeStayTypes } from "../controllers/userPage/user.controller.js";
+import { cityBaes, homeFeatured, homeStayTypes } from "../controllers/userPage/user.controller.js";
 // import { verifyJWT } from "../middlewares/auth.middleware.js";
 
 const router = Router();
@@ -10,6 +10,7 @@ const router = Router();
 
 router.route("/feature").get(homeFeatured);
 router.route("/stay_types").get(homeStayTypes);
+router.route("/city_based").get(cityBaes);
 
 
 export default router;
