@@ -1,6 +1,7 @@
 import { Stay } from "../../models/stayModel.js"
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import { ApiError } from "../../utils/ApiError.js";
+import { Review } from "../../models/reviewModel.js"
 
 
 // Get last 15 featured stays
@@ -66,6 +67,47 @@ export const cityBaes = asyncHandler(async (req, res, next) => {
             status: "success",
             results: stays.length,
             data: stays,
+        });
+    } catch (error) {
+        next(new ApiError(error.message, 500));
+    }
+});
+
+
+export const topReview = asyncHandler(async (req, res, next) => {
+    try {
+        console.log("jee");
+
+        // Fetch latest 5 reviews
+        const reviews = await Review.find({ isEnabled: true })
+            .sort({ createdAt: -1 }) // latest first
+            .limit(5)
+            .populate({
+                path: "user_id",
+                select: "fullName profileImage", // get user's name and profile image
+            })
+            .lean(); // convert to plain JS objects
+
+        if (!reviews || reviews.length === 0) {
+            return next(new ApiError("No reviews found", 404));
+        }
+
+        // Map reviews to include user name and image directly
+        const formattedReviews = reviews.map((r) => ({
+            _id: r._id,
+            stay_id: r.stay_id,
+            stay_title: r.stay_title,
+            comment: r.comment,
+            rating: r.rating,
+            createdAt: r.createdAt,
+            user_name: r.user_id?.fullName || r.user_name,
+            user_image: r.user_id?.profileImage?.[0]?.url || null,
+        }));
+
+        res.status(200).json({
+            status: "success",
+            results: formattedReviews.length,
+            data: formattedReviews,
         });
     } catch (error) {
         next(new ApiError(error.message, 500));
