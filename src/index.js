@@ -124,7 +124,7 @@ app.use("/api/v1/user", userRouter);
 app.use("/api/v1/chat/booking", chatRouter);
 app.use("/api/v1/subscription", subscriptionRouter);
 
-app.use("/api/v1/user", userSection)
+app.use("/api/v1/customer", userSection)
 
 app.use(errorHandler);
 app.get('/', (req, res) => {
