@@ -1,0 +1,10 @@
+**/.git
+**/.svn
+**/.hg
+**/node_modules
+/.vscode
+./dist
+./.next
+*.env
+.env
+.env.*
