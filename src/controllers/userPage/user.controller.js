@@ -20,3 +20,30 @@ export const homeFeatured = asyncHandler(async (req, res, next) => {
         data: featuredStays,
     });
 });
+
+
+export const homeStayTypes = asyncHandler(async (req, res, next) => {
+    try {
+        // Get all unique stay types
+        const stayTypes = await Stay.distinct("stayType");
+
+        // For each type, get one stay
+        const staysByType = await Promise.all(
+            stayTypes.map(async (type) => {
+                const stay = await Stay.findOne({ stayType: type })
+                    .sort({ _id: -1 }) // Optional: latest stay for this type
+                    .populate("state_id city_id")
+                    .lean(); // convert to plain JS object
+                return stay;
+            })
+        );
+
+        res.status(200).json({
+            status: "success",
+            results: staysByType.length,
+            data: staysByType,
+        });
+    } catch (error) {
+        next(new ApiError(error.message, 500));
+    }
+});

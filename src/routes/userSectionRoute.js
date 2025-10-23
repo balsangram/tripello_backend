@@ -1,6 +1,6 @@
 // routes/userRoutes.js
 import { Router } from "express";
-import { homeFeatured } from "../controllers/userPage/user.controller.js";
+import { homeFeatured, homeStayTypes } from "../controllers/userPage/user.controller.js";
 // import { verifyJWT } from "../middlewares/auth.middleware.js";
 
 const router = Router();
@@ -9,6 +9,7 @@ const router = Router();
 // router.use(verifyJWT);
 
 router.route("/feature").get(homeFeatured);
+router.route("/stay_types").get(homeStayTypes);
 
 
 export default router;
