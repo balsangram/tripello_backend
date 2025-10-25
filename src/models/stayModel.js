@@ -102,7 +102,7 @@ const staySchema = new Schema({
   checkin_time: {
     type: String,
     required: true,
-  },
+  },  
   checkout_time: {
     type: String,
   },

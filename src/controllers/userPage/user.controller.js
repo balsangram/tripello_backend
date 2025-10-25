@@ -6,10 +6,11 @@ import { Review } from "../../models/reviewModel.js"
 
 // Get last 15 featured stays
 export const homeFeatured = asyncHandler(async (req, res, next) => {
-    // Fetch stays where featured is true, sorted by newest first, limit 15
+    // Fetch only selected fields where featured = true
     const featuredStays = await Stay.find({ featured: true })
-        .sort({ _id: -1 }) // Assuming newer stays have bigger _id
-        .limit(15);
+        .sort({ _id: -1 }) // Newest first
+        .limit(15)
+        .select("title city_name images price"); // 👈 Only these fields
 
     if (!featuredStays || featuredStays.length === 0) {
         return next(new ApiError("No featured stays found", 404));
@@ -21,6 +22,7 @@ export const homeFeatured = asyncHandler(async (req, res, next) => {
         data: featuredStays,
     });
 });
+
 
 export const homeStayTypes = asyncHandler(async (req, res, next) => {
     try {

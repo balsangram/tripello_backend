@@ -13,7 +13,8 @@ import {
   chatRouter,
   userRouter,
   subscriptionRouter,
-  userSection
+  userSection,
+notificationRouter
 } from "./routes/index.js";
 
 // import path from "path";
@@ -125,6 +126,7 @@ app.use("/api/v1/chat/booking", chatRouter);
 app.use("/api/v1/subscription", subscriptionRouter);
 
 app.use("/api/v1/customer", userSection)
+app.use("/api/v1/notification", notificationRouter)
 
 app.use(errorHandler);
 app.get('/', (req, res) => {

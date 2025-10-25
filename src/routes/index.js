@@ -10,6 +10,7 @@ import chatRouter from "./chatRoute.js";
 import userRouter from "./userRoute.js";
 import subscriptionRouter from "./subscriptionRoute.js";
 import userSection from "./userSectionRoute.js";
+import notificationRouter from "./notificationRouter.js"
 
 
 export {
@@ -23,6 +24,7 @@ export {
   userRouter,
   subscriptionRouter,
   userSection,
+  notificationRouter,
 };
 
 // first change the index.js
