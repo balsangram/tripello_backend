@@ -24,31 +24,26 @@ export const homeFeatured = asyncHandler(async (req, res, next) => {
 });
 
 
+
 export const homeStayTypes = asyncHandler(async (req, res, next) => {
     try {
-        // Get all unique stay types
-        const stayTypes = await Stay.distinct("stayType");
+        // Get enum values directly from staySchema
+        const stayTypes = Stay.schema.path("stayType").enumValues;
 
-        // For each type, get one stay
-        const staysByType = await Promise.all(
-            stayTypes.map(async (type) => {
-                const stay = await Stay.findOne({ stayType: type })
-                    .sort({ _id: -1 }) // Optional: latest stay for this type
-                    .populate("state_id city_id")
-                    .lean(); // convert to plain JS object
-                return stay;
-            })
-        );
+        if (!stayTypes || stayTypes.length === 0) {
+            return next(new ApiError("No stay types defined in schema", 404));
+        }
 
         res.status(200).json({
             status: "success",
-            results: staysByType.length,
-            data: staysByType,
+            results: stayTypes.length,
+            data: stayTypes,
         });
     } catch (error) {
         next(new ApiError(error.message, 500));
     }
 });
+
 
 export const cityBaes = asyncHandler(async (req, res, next) => {
     try {
@@ -59,7 +54,7 @@ export const cityBaes = asyncHandler(async (req, res, next) => {
         const stays = await Stay.find({ city_name: { $regex: `^${city}$`, $options: "i" } })
             .sort({ _id: -1 }) // latest first
             .limit(15)
-            .populate("state_id city_id"); // populate state and city references
+            .select("title city_name images price"); // ✅ Only show these fields
 
         if (!stays || stays.length === 0) {
             return next(new ApiError(`No stays found in city: ${city}`, 404));
@@ -74,6 +69,7 @@ export const cityBaes = asyncHandler(async (req, res, next) => {
         next(new ApiError(error.message, 500));
     }
 });
+
 
 
 export const topReview = asyncHandler(async (req, res, next) => {
